@@ -1,10 +1,12 @@
+import { User } from "../model/User";
+
 class AuthController {
-    login() {
+    login(user: User) {
 
     }
 
     register() {
-
+        
     }
 }
 
