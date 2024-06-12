@@ -1,8 +1,4 @@
-import express, { Application, NextFunction, Request, Response } from 'express';
-const app:Application = express();
-
-app.get('/', (req:Request, res:Response, next:NextFunction) => {
-    res.send("Hello")
-})
-
-app.listen(5000, () => console.log("sever access"));
+import { ConfigServer } from "./config/ConfigServer";
+const configServer = new ConfigServer();
+configServer.setUpServer();
+require('dotenv').config();
