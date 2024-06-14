@@ -1,4 +1,4 @@
-class ApiConstant {
-    public static readonly API_LOGIN: string = "/login";
-    public static readonly API_REGISTER: string = "/register";
-}
+export const ApiConstant = {
+  API_LOGIN: "/login",
+  API_REGISTER: "/register",
+};
