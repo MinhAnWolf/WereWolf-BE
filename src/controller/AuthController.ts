@@ -1,9 +1,8 @@
-import { checkSchema } from "express-validator";
+import { validationResult  } from "express-validator";
 import { User } from "../model/User";
 import { Request, Response } from "express";
 import { UserSchema } from "../entity/User";
 import bcrypt from "bcrypt";
-import { Regex } from "../regex/Regex";
 import { genToken } from "../Service/JwtService";
 
 const saltRounds = 10;
@@ -23,37 +22,9 @@ class AuthController {
       await bcrypt.compare(data.password, user?.password as string);
     }
 
-    const errorValid = await checkSchema({
-      username: {
-        notEmpty: {
-          errorMessage: "Username not empty",
-        },
-        matches: {
-          options: Regex.username,
-          errorMessage: "Username is wrong format",
-        },
-      },
-      password: {
-        notEmpty: {
-          errorMessage: "Password not empty",
-        },
-        matches: {
-          options: Regex.username,
-          errorMessage: "password is wrong format",
-        },
-      },
-    });
-
-    let errorList: any = [];
-    errorValid.forEach((item: any) => {
-      if (item.errors.lenght > 0) {
-        errorList.push(item.errors[0]);
-      }
-    });
-
-    if (errorList.length > 0) {
-      res.status(400);
-      return res.json(errorList);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
     try {
@@ -83,47 +54,11 @@ class AuthController {
       confirmPassword: req.body.confirmPassword,
     };
 
-    const errorValid = await checkSchema({
-      username: {
-        notEmpty: {
-          errorMessage: "Username not empty",
-        },
-        matches: {
-          options: Regex.username,
-          errorMessage: "Username is wrong format",
-        },
-      },
-      password: {
-        notEmpty: {
-          errorMessage: "Password not empty",
-        },
-        matches: {
-          options: Regex.username,
-          errorMessage: "password is wrong format",
-        },
-      },
-
-      confirmPassword: {
-        notEmpty: {
-          errorMessage: "Confirm password not empty",
-        },
-      },
-    }).run(req);
-
-    let errorList: any = [];
-    errorValid.forEach((item: any) => {
-      if (item.errors.lenght > 0) {
-        errorList.push(item.errors[0]);
-      }
-    });
-
-    if (errorList.length > 0) {
-      res.status(400);
-      return res.json(errorList);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    console.log(data.password);
-    console.log(data.confirmPassword);
     if (data.password !== data.confirmPassword) {
       return res.json({
         errorCode: 1,
