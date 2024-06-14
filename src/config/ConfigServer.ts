@@ -17,7 +17,7 @@ class ConfigServer {
     setUpServer = () => {
         app.use(express.json());
         app.use(express.urlencoded({ extended: true }));
-    
+
         let port = process.env.PORT;
         httpServer.listen(port, () => {
             console.log('Server is running on http://' + os.hostname + ':' + port);
@@ -31,8 +31,6 @@ class ConfigServer {
         })
     }
 }
-
-
 
 export {app, ConfigServer, io};
 
