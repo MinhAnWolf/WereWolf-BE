@@ -1,5 +1,8 @@
+import { Role } from "./Role";
+
 export interface User {
-  username: string;
-  password: string;
-  confirmPassword?: string | null;
+    userId: string,
+    username: string,
+    role: Role,
+    status: boolean // trạng thái live - died
 }

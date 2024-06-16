@@ -1,7 +1,7 @@
 import { validationResult  } from "express-validator";
-import { User } from "../model/User";
+import { Authen } from "../model/Authen";
 import { Request, Response } from "express";
-import { UserSchema } from "../entity/User";
+import { UserSchema } from "../entity/UserSchema";
 import bcrypt from "bcrypt";
 import { genToken } from "../Service/JwtService";
 
@@ -9,7 +9,7 @@ const saltRounds = 10;
 
 class AuthController {
   async login(req: Request, res: Response) {
-    const data: User = {
+    const data: Authen = {
       username: req.body.username,
       password: req.body.password,
     };
@@ -48,7 +48,7 @@ class AuthController {
   }
 
   async register(req: Request, res: Response) {
-    const data: User = {
+    const data: Authen = {
       username: req.body.username,
       password: req.body.password,
       confirmPassword: req.body.confirmPassword,
