@@ -1,0 +1,28 @@
+Role:
+  villagerRole:
+    villager:
+      id: 1
+      name: villager
+      skill: ...
+      kick: all
+      effect: all
+    doctor:
+      id: 3
+      name: doctor
+      skill: ...
+      kick: all
+      effect: all
+    witch:
+      id: 4
+      name: doctor
+      skill: ...
+      kick: all
+      effect: all
+  werewolfRole:
+    wolf:
+      id: 0
+      name: wolf
+      skill: ...
+      kick: all
+      effect: all
+  specialRole:

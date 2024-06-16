@@ -1,10 +1,8 @@
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import Database from "./Database";
 const express = require("express");
-const os = require("os");
 const app = express();
 const { createServer } = require("http");
-const { Server } = require("socket.io");
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -12,6 +10,8 @@ const io = new Server(httpServer, {
   },
   path: "/test/socket.io",
 });
+import { createRoom, joinRoom, listRoom, showDetailRoom } from "../socket/RoomService";
+
 
 class ConfigServer {
   setUpServer = () => {
@@ -28,6 +28,10 @@ class ConfigServer {
     io.on("connect", (socket: Socket) => {
       console.log("Socket on port : " + port);
       socket.emit("message", `Wellcom ${socket.id} to nodejs socket.io`);
+      createRoom(socket);
+      joinRoom(socket);
+      listRoom(socket);
+      showDetailRoom(socket);  
     });
   };
 }
