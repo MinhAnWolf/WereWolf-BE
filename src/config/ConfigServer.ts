@@ -34,7 +34,7 @@ class ConfigServer {
       socket.emit("message", `Wellcom ${socket.id} to nodejs socket.io`);
       const userId = socket.handshake.headers.userid;
       socket.join(userId as string);
-      createRoom(socket);
+      createRoom(socket, userId as string);
       joinRoom(socket);
       listRoom(socket);
       showDetailRoom(socket);
