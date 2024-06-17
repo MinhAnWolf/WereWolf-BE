@@ -8,12 +8,11 @@ export function createRoom(socket: Socket) {
     console.log("inside - create_room");
     const data: Room = {
       roomId: uuidv4(),
-      user: [room.roomOwner],
+      userId: [room.roomOwner],
       roomOwner: room.roomOwner,
       slot: room.slot, // slot quy định
       type: room.type,
       status: "open", // trạng thái open - watting - in game
-      socketId: [socket.id],
       clock: false,
     };
     socket.join(data.roomId as string);
