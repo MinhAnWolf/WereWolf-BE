@@ -1,5 +1,5 @@
-import { validationResult  } from "express-validator";
-import { Authen } from "../model/Authen";
+import { validationResult } from "express-validator";
+import { Authen } from "../type/Authen";
 import { Request, Response } from "express";
 import { UserSchema } from "../entity/UserSchema";
 import bcrypt from "bcrypt";

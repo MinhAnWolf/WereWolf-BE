@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { User } from "../model/User";
+import { User } from "../type/User";
 
 const roomSchema = new Schema({
   roomId: {
@@ -7,6 +7,10 @@ const roomSchema = new Schema({
     require: true,
   },
   user: {
+    type: [String],
+    require: true,
+  },
+  socketId: {
     type: [String],
     require: true,
   },
@@ -25,7 +29,7 @@ const roomSchema = new Schema({
   type: {
     type: String,
     require: true,
-  }
+  },
 });
 
 export const RoomSchema = model("Rooms", roomSchema);

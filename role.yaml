@@ -6,23 +6,114 @@ Role:
       skill: ...
       kick: all
       effect: all
-    doctor:
-      id: 3
+    bodyguard:
+      id: 2
       name: doctor
       skill: ...
       kick: all
       effect: all
     witch:
+      id: 3
+      name: doctor
+      skill: ...
+      kick: all
+      effect: all
+    hunter:
       id: 4
+      name: doctor
+      skill: ...
+      kick: all
+      effect: all
+    littleGirl:
+      id: 5
+      name: doctor
+      skill: ...
+      kick: all
+      effect: all
+    medium:
+      id: 6
+      name: doctor
+      skill: ...
+      kick: all
+      effect: all
+    cupid:
+      id: 7
       name: doctor
       skill: ...
       kick: all
       effect: all
   werewolfRole:
     wolf:
-      id: 0
+      id: 8
+      name: wolf
+      skill: ...
+      kick: all
+      effect: all
+    wolfCub:
+      id: 9
+      name: wolf
+      skill: ...
+      kick: all
+      effect: all
+    alphaWolf:
+      id: 10
       name: wolf
       skill: ...
       kick: all
       effect: all
   specialRole:
+    traitor:
+      id: 11
+      name: wolf
+      skill: ...
+      kick: all
+      effect: all
+    piedPiper:
+      id: 12
+      name: wolf
+      skill: ...
+      kick: all
+      effect: all
+    mason:
+      id: 13
+      name: wolf
+      skill: ...
+      kick: all
+      effect: all
+    count:
+      id: 14
+      name: wolf
+      skill: ...
+      kick: all
+      effect: all
+  # extendedRole:
+  #   nightHunter:
+  #     id: 0
+  #     name: wolf
+  #     skill: ...
+  #     kick: all
+  #     effect: all
+  #   medium:
+  #     id: 0
+  #     name: wolf
+  #     skill: ...
+  #     kick: all
+  #     effect: all
+  #   sorcerer:
+  #     id: 0
+  #     name: wolf
+  #     skill: ...
+  #     kick: all
+  #     effect: all
+  #   shadowWolf:
+  #     id: 0
+  #     name: wolf
+  #     skill: ...
+  #     kick: all
+  #     effect: all
+  #   fireWolf:
+      id: 0
+      name: wolf
+      skill: ...
+      kick: all
+      effect: all
