@@ -3,17 +3,15 @@ import { v4 as uuidv4 } from "uuid";
 import { Room } from "../type/Room";
 import { RoomSchema } from "../entity/RoomSchema";
 
-export function createRoom(socket: Socket) {
+export function createRoom(socket: Socket, userRequest:string) {
   socket.on("create_room", async (room: Room) => {
-    console.log("inside - create_room");
     const data: Room = {
       roomId: uuidv4(),
-      user: [room.roomOwner],
-      roomOwner: room.roomOwner,
+      userId: [userRequest],
+      roomOwner: userRequest,
       slot: room.slot, // slot quy định
       type: room.type,
       status: "open", // trạng thái open - watting - in game
-      socketId: [socket.id],
       clock: false,
     };
     socket.join(data.roomId as string);

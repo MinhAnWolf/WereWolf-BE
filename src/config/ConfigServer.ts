@@ -8,7 +8,7 @@ const io = new Server(httpServer, {
   cors: {
     origin: true,
   },
-  path: "/test/socket.io",
+  // path: "/socket.io?auth",
 });
 import {
   createRoom,
@@ -32,7 +32,9 @@ class ConfigServer {
     io.on("connect", (socket: Socket) => {
       console.log("Socket on port : " + port);
       socket.emit("message", `Wellcom ${socket.id} to nodejs socket.io`);
-      createRoom(socket);
+      const userId = socket.handshake.headers.userid;
+      socket.join(userId as string);
+      createRoom(socket, userId as string);
       joinRoom(socket);
       listRoom(socket);
       showDetailRoom(socket);

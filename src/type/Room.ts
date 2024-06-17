@@ -1,8 +1,7 @@
 export interface Room {
   roomId: String;
-  user: [String];
+  userId: [String];
   roomOwner: String;
-  socketId: [String];
   slot: Number;
   type: String;
   status: String;
