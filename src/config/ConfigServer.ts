@@ -10,8 +10,12 @@ const io = new Server(httpServer, {
   },
   path: "/test/socket.io",
 });
-import { createRoom, joinRoom, listRoom, showDetailRoom } from "../socket/RoomService";
-
+import {
+  createRoom,
+  joinRoom,
+  listRoom,
+  showDetailRoom,
+} from "../socket/RoomService";
 
 class ConfigServer {
   setUpServer = () => {
@@ -31,7 +35,7 @@ class ConfigServer {
       createRoom(socket);
       joinRoom(socket);
       listRoom(socket);
-      showDetailRoom(socket);  
+      showDetailRoom(socket);
     });
   };
 }
