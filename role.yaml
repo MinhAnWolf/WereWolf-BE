@@ -42,46 +42,52 @@ Role:
       skill: ...
       kick: all
       effect: all
-  werewolfRole:
-    wolf:
+    seer:
       id: 8
-      name: wolf
+      name: doctor
       skill: ...
       kick: all
       effect: all
-    wolfCub:
+  werewolfRole:
+    wolf:
       id: 9
       name: wolf
       skill: ...
       kick: all
       effect: all
-    alphaWolf:
+    wolfCub:
       id: 10
+      name: wolf
+      skill: ...
+      kick: all
+      effect: all
+    alphaWolf:
+      id: 11
       name: wolf
       skill: ...
       kick: all
       effect: all
   specialRole:
     traitor:
-      id: 11
-      name: wolf
-      skill: ...
-      kick: all
-      effect: all
-    piedPiper:
       id: 12
       name: wolf
       skill: ...
       kick: all
       effect: all
-    mason:
+    piedPiper:
       id: 13
       name: wolf
       skill: ...
       kick: all
       effect: all
-    count:
+    mason:
       id: 14
+      name: wolf
+      skill: ...
+      kick: all
+      effect: all
+    count:
+      id: 15
       name: wolf
       skill: ...
       kick: all

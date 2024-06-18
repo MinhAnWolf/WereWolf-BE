@@ -3,15 +3,15 @@ import { Schema, model } from "mongoose";
 const userSchema = new Schema({
   username: {
     type: String,
-    require: true,
+    required: true,
   },
   password: {
     type: String,
-    require: true,
+    required: true,
   },
   remember: {
     type: Boolean,
-    require: true,
+    required: true,
   },
 });
 
