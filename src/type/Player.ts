@@ -1,6 +1,8 @@
+import { RoleResponse } from "./RoleResponse";
+
 export interface Player {
   playerId: String;
   roomId: String;
   username: String;
-  roleName: String;
+  role: RoleResponse;
 }

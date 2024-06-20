@@ -5,6 +5,8 @@ import { Player } from "../type/Player";
 import { UserSchema } from "../entity/UserSchema";
 import { User } from "../type/User";
 import { Role } from "../type/Role";
+import { readFileYml } from "../core/utils/Utilities";
+
 
 export async function playGame(socket: Socket) {
   socket.on("play-game", async (roomDetail: Room, stage: string) => {
@@ -12,19 +14,22 @@ export async function playGame(socket: Socket) {
     let countDay = 0;
     switch (stage) {
       case "start":
-        let memoryRole = new Array<Number>();
+        
+        let memoryRole = new Map<String, String>();
         //create player and emit every player
         for (let index = 0; index < roomDetail.userId.length; index++) {
           let idUser = roomDetail.userId[index];
           let dataUser = await UserSchema.findById(idUser).exec();
-
+          let slotRequest:number[] = findRoleBySlot(roomDetail.slot as number) || [];
+          const role = handleRole(memoryRole, roomDetail, slotRequest);
+          let uuid = uuidv4();
           let dataPlayer: Player = {
-            playerId: uuidv4(),
+            playerId: uuid,
             roomId: roomDetail.roomId,
             username: dataUser?.username || "",
-            roleName: "?",
+            role: role,
           };
-          memoryRole.push(handleRole());
+          memoryRole.set()
           socket.to(idUser as string).emit("player-data", dataPlayer);
         }
 
@@ -49,30 +54,51 @@ function checkSlot(room: Room, socket: Socket) {
   }
 }
 
-function handleRole(memoryRole: Array<Number>, roomDetail: Room) {
+function handleRole(memoryRole: Map<String, String>, roomDetail: Room, defaultSlot:number[]) {
   let slot = roomDetail.slot;
-  let fullDataRole: Role;
-  let rule5Slot = [8, 9, 1, 1, 1];
-  let rule6Slot = [8, 9, 2, 1, 1, 1];
-  let rule7Slot = [8, 9, 9, 1, 1, 1, 2];
-  let rule8Slot = [8, 9, 9, 1, 1, 1, 2, 4];
-  let rule9Slot = [8, 9, 9, 1, 1, 1, 1, 2, 4];
-  let rule10Slot = [8, 9, 9, 1, 1, 1, 1, 2, 4, 3];
-
+  let fullDataRole: Role = readFileYml("role.yaml") as Role;
+  
   if (memoryRole === null) {
-    return randomRole(rule5Slot);
+    return randomRole(defaultSlot);
   }
 
   // check include
-  randomRole(rule5Slot);
+  randomRole(defaultSlot);
 }
 
 function randomRole(arr: number[]) {
+  checkDuplicateRole()
   return Math.floor(Math.random() * arr.length);
 }
 
 function checkDuplicateRole(memoryRole: Array<number>, ruleSlot: number[]) {
   if () {
     
+  }
+}
+
+function findRoleBySlot(slot:number) {
+  let default5Slot = [8, 9, 1, 1, 1];
+  let default6Slot = [8, 9, 2, 1, 1, 1];
+  let default7Slot = [8, 9, 9, 1, 1, 1, 2];
+  let default8Slot = [8, 9, 9, 1, 1, 1, 2, 4];
+  let default9Slot = [8, 9, 9, 1, 1, 1, 1, 2, 4];
+  let default10Slot = [8, 9, 9, 1, 1, 1, 1, 2, 4, 3];
+
+  switch (slot) {
+    case 5:
+      return default5Slot;
+    case 6:
+      return default6Slot;
+    case 7:
+      return default7Slot;
+    case 8:
+      return default8Slot;
+    case 9:
+      return default9Slot;
+    case 10:
+      return default10Slot;
+    default:
+      break;
   }
 }
