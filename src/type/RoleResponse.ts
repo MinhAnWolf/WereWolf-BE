@@ -1,4 +1,4 @@
 export interface RoleResponse {
-  idRole: String;
+  idRole: Number;
   nameRole: String;
 }

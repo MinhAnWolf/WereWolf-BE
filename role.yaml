@@ -118,8 +118,8 @@ Role:
   #     kick: all
   #     effect: all
   #   fireWolf:
-      id: 0
-      name: wolf
-      skill: ...
-      kick: all
-      effect: all
+      # id: 0
+      # name: wolf
+      # skill: ...
+      # kick: all
+      # effect: all
