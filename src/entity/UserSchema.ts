@@ -11,7 +11,7 @@ const userSchema = new Schema({
   },
   remember: {
     type: Boolean,
-    required: true,
+    required: false,
   },
 });
 
