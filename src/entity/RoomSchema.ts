@@ -3,7 +3,7 @@ import { User } from "../type/User";
 
 const roomSchema = new Schema({
   roomId: {
-    type: Number,
+    type: String,
     require: true,
   },
   user: {

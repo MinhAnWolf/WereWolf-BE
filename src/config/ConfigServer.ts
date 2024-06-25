@@ -13,7 +13,7 @@ const io = new Server(httpServer, {
 import {
   createRoom,
   joinRoom,
-  listRoom,
+  // listRoom,
   showDetailRoom,
 } from "../socket/RoomService";
 
@@ -31,12 +31,13 @@ class ConfigServer {
 
     io.on("connect", (socket: Socket) => {
       console.log("Socket on port : " + port);
-      socket.emit("message", `Wellcom ${socket.id} to nodejs socket.io`);
       const userId = socket.handshake.headers.userid;
+      console.log(userId); 
       socket.join(userId as string);
+      socket.emit("message", `Wellcom ${socket.id} to nodejs socket.io`);
       createRoom(socket, userId as string);
       joinRoom(socket);
-      listRoom(socket);
+      // listRoom(socket);
       showDetailRoom(socket);
     });
   };

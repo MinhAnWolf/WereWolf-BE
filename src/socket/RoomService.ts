@@ -16,7 +16,9 @@ export function createRoom(socket: Socket, userRequest:string) {
     };
     socket.join(data.roomId as string);
     await RoomSchema.create(data);
-    await socket.emit("create_room", "create success and navigate detail room");
+    const rooms = await RoomSchema.find().lean(); 
+    socket.emit("list-room", rooms);
+    // await listRoom(socket)
   });
 }
 
@@ -32,11 +34,11 @@ export function joinRoom(socket: Socket) {
   });
 }
 
-export function listRoom(socket: Socket) {
-  socket.on("list_room", async (socket) => {
-    await socket.emit(RoomSchema.find());
-  });
-}
+// export function listRoom(socket: Socket) {
+//   socket.on("list_room", async (socket) => {
+//     await socket.emit("",RoomSchema.find());
+//   });
+// }
 
 export function showDetailRoom(socket: Socket) {
   socket.on("show_detail", async (roomId = socket) => {
