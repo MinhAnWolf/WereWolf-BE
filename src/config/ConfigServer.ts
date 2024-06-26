@@ -33,10 +33,13 @@ class ConfigServer {
       console.log("Socket on port : " + port);
       const userId = socket.handshake.headers.userid;
       const roomId = socket.handshake.headers.roomid;
+      if (roomId) {
+        socket.join(roomId as string);
+      }
       socket.join(userId as string);
       socket.emit("message", `Wellcom ${socket.id} to nodejs socket.io`);
       createRoom(socket, userId as string);
-      joinRoom(socket, roomId as string, userId as string);
+      joinRoom(socket, userId as string,  io);
       listRoom(socket);
       showDetailRoom(socket);
     });
