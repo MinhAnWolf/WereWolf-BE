@@ -31,11 +31,15 @@ class ConfigServer {
 
     io.on("connect", (socket: Socket) => {
       console.log("Socket on port : " + port);
-      socket.emit("message", `Wellcom ${socket.id} to nodejs socket.io`);
       const userId = socket.handshake.headers.userid;
+      const roomId = socket.handshake.headers.roomid;
+      if (roomId) {
+        socket.join(roomId as string);
+      }
       socket.join(userId as string);
+      socket.emit("message", `Wellcom ${socket.id} to nodejs socket.io`);
       createRoom(socket, userId as string);
-      joinRoom(socket);
+      joinRoom(socket, userId as string,  io);
       listRoom(socket);
       showDetailRoom(socket);
     });

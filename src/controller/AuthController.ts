@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import { UserSchema } from "../entity/UserSchema";
 import bcrypt from "bcrypt";
 import { genToken } from "../Service/JwtService";
+import { v4 as uuidv4 } from "uuid";
 
 const saltRounds = 10;
 
@@ -49,6 +50,7 @@ class AuthController {
 
   async register(req: Request, res: Response) {
     const data: Authen = {
+      userid: uuidv4(),
       username: req.body.username,
       password: req.body.password,
       confirmPassword: req.body.confirmPassword,

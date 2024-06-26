@@ -1,14 +1,19 @@
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { Room } from "../type/Room";
 import { RoomSchema } from "../entity/RoomSchema";
+import { RoomDetail } from "../type/RoomDetail";
+import { UserSchema } from "../entity/UserSchema";
 
-export function createRoom(socket: Socket, userRequest:string) {
+export async function createRoom(socket: Socket, useridRequest: string) {
   socket.on("create_room", async (room: Room) => {
+    const user = await UserSchema.findOne({
+      $or: [{ userid: useridRequest }],
+    });
     const data: Room = {
       roomId: uuidv4(),
-      userId: [userRequest],
-      roomOwner: userRequest,
+      userid: [useridRequest],
+      roomOwner: user?.username as string,
       slot: room.slot, // slot quy định
       type: room.type,
       status: "open", // trạng thái open - watting - in game
@@ -16,26 +21,64 @@ export function createRoom(socket: Socket, userRequest:string) {
     };
     socket.join(data.roomId as string);
     await RoomSchema.create(data);
-    await socket.emit("create_room", "create success and navigate detail room");
+    listRoom(socket);
   });
 }
 
-export function joinRoom(socket: Socket) {
-  console.log("inside - joinRoom");
-  socket.on("join_room", async (roomId) => {
-    await socket.emit(
-      "show_detail",
-      RoomSchema.findOne({
-        $or: [{ roomId: roomId }],
-      })
-    );
+export async function joinRoom(
+  socket: Socket,
+  useridRequest: string,
+  io: Server
+) {
+  
+  socket.on("join_room", async (roomReq: Room) => {
+    await socket.join(roomReq.roomId as string);
+    let roomId = roomReq.roomId;
+    console.log(roomId);
+    // FIND ONE ROOM
+    const room = await RoomSchema.findOne({ $or: [{ roomId: roomId }] });
+
+    if (room) {      
+      
+      // AVOID ADD OWNER ROOM MORE OR USER EXIST ROOM
+      const user = await UserSchema.findOne({
+        $or: [{ userid: useridRequest }],
+      });
+      if (user?.username != room.roomOwner || !room.userid.includes(useridRequest)) {
+        room.userid.push(useridRequest);
+      }
+      const reRoom = await RoomSchema.findOneAndUpdate(
+        { roomId },
+        { $set: { userid: room.userid } },
+        { new: true }
+      );
+      let data: RoomDetail[] = [];
+      if (reRoom) {
+        for (let i = 0; i < reRoom.userid.length; i++) {
+          const user = await UserSchema.findOne({
+            $or: [{ userid: room.userid[i] }],
+          });
+          // SET DATA ROOM DETAIL
+          data.push({
+            userName: user?.username as string,
+            avartar: user?.avartar as string,
+            roomId: roomId as string,
+            userId: room.userid[i] as string,
+          });
+        }
+      }
+      const userReq = await UserSchema.findOne({
+        $or: [{ userid: useridRequest }],
+      });
+      io.in(roomId as string).emit("message-room", userReq?.username + "đã tham gia")
+      io.in(roomId as string).emit("join_room", data); 
+    }
   });
 }
 
-export function listRoom(socket: Socket) {
-  socket.on("list_room", async (socket) => {
-    await socket.emit(RoomSchema.find());
-  });
+export async function listRoom(socket: Socket) {
+  const rooms = await RoomSchema.find().lean();
+  socket.emit("list-room", rooms);
 }
 
 export function showDetailRoom(socket: Socket) {
