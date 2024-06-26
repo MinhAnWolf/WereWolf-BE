@@ -6,11 +6,7 @@ const roomSchema = new Schema({
     type: String,
     require: true,
   },
-  user: {
-    type: [String],
-    require: true,
-  },
-  socketId: {
+  userid: {
     type: [String],
     require: true,
   },
@@ -28,6 +24,10 @@ const roomSchema = new Schema({
   },
   type: {
     type: String,
+    require: true,
+  },
+  clock: {
+    type: Boolean,
     require: true,
   },
 });

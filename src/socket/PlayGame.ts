@@ -17,17 +17,17 @@ export async function playGame(socket: Socket) {
       case "start":
         let memoryRole: number[] = [];
         //create player and emit every player
-        for (let index = 0; index < roomDetail.userId.length; index++) {
-          let idUser = roomDetail.userId[index];
+        for (let index = 0; index < roomDetail.userid.length; index++) {
+          let idUser = roomDetail.userid[index];
           let dataUser = await UserSchema.findById(idUser).exec();
           let slotRequest: number[] =
             findRoleBySlot(roomDetail.slot as number) || [];
-           const resultRole = await handleRole(memoryRole, slotRequest)
+          const resultRole = await handleRole(memoryRole, slotRequest);
           if (resultRole && resultRole.roleId != null) {
             const roleId = Number(resultRole.roleId);
             if (!isNaN(roleId)) {
               memoryRole.push(roleId);
-            }   
+            }
           }
           let uuid = uuidv4();
           let dataPlayer: Player = {
@@ -36,7 +36,7 @@ export async function playGame(socket: Socket) {
             username: dataUser?.username || "",
             role: {
               idRole: Number(resultRole?.roleId),
-              nameRole: resultRole?.roleName as string
+              nameRole: resultRole?.roleName as string,
             },
           };
           socket.to(idUser as string).emit("player-data", dataPlayer);
@@ -68,7 +68,7 @@ async function handleRole(memoryRole: number[], defaultSlot: number[]) {
   if (memoryRole === null) {
     return await RoleSchema.findOne({
       $or: [{ roleId: random }],
-    });;
+    });
   }
 
   if (checkDuplicate(memoryRole, random)) {
@@ -76,7 +76,7 @@ async function handleRole(memoryRole: number[], defaultSlot: number[]) {
   }
   return await RoleSchema.findOne({
     $or: [{ roleId: random }],
-  });;
+  });
 }
 
 function checkDuplicate(memoryRole: number[], value: number) {
@@ -87,7 +87,7 @@ function reRandom(memoryRole: number[], defaultSlot: number[]) {
   let random = Math.floor(Math.random() * defaultSlot.length);
 
   if (checkDuplicate(memoryRole, random)) {
-   reRandom(memoryRole, defaultSlot);
+    reRandom(memoryRole, defaultSlot);
   }
   return random;
 }
