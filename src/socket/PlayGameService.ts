@@ -20,13 +20,9 @@ export function readyGame(
 
 export function playGame(socket: Socket, io: Server, useridReq: string) {
   socket.on("play-game", async (roomDetail: Room) => {
-    console.log(typeof roomDetail);
     let countDay = 0;
-    console.log("s " + roomDetail.roomId);
     switch (roomDetail.stage) {
       case "start":
-        console.log("feature start");
-
         // ONLY OWNER ROOM ACTION START GAME
         const user = await UserSchema.findOne({
           $or: [{ userid: useridReq }],
