@@ -7,4 +7,5 @@ export interface Room {
   status?: String;
   clock?: Boolean;
   password?: String;
+  stage?: String; // start - morning - night
 }

@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-import { User } from "../type/User";
 
 const roomSchema = new Schema({
   roomId: {

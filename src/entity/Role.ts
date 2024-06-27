@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 const roleSchema = new Schema({
   roleId: {
-    type: String,
+    type: Number,
     require: true,
   },
   roleName: {
@@ -10,7 +10,7 @@ const roleSchema = new Schema({
     require: true,
   },
   skill: {
-    type: [],
+    type: String,
     require: true,
   },
   kick: {
@@ -19,6 +19,10 @@ const roleSchema = new Schema({
   },
   effect: {
     type: [],
+    require: true,
+  },
+  group: {
+    type: Number, // 1: villagerRole - 2:werewolfRole - 3:specialRole
     require: true,
   },
 });

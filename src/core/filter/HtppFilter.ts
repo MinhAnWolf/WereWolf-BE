@@ -5,7 +5,8 @@ import { ApiConstant } from "../../constant/ApiConstant";
 function HtppFilter(req: Request, res: Response, next: NextFunction) {
   if (
     req.url.includes(ApiConstant.API_LOGIN) ||
-    req.url.includes(ApiConstant.API_REGISTER)
+    req.url.includes(ApiConstant.API_REGISTER) ||
+    req.url.includes(ApiConstant.API_CU_ROLE)
   ) {
     console.log("filter");
     next();

@@ -10,12 +10,8 @@ const io = new Server(httpServer, {
   },
   // path: "/socket.io?auth",
 });
-import {
-  createRoom,
-  joinRoom,
-  listRoom,
-  showDetailRoom,
-} from "../socket/RoomService";
+import { createRoom, joinRoom, listRoom } from "../socket/RoomService";
+import { playGame, readyGame } from "../socket/PlayGameService";
 
 class ConfigServer {
   setUpServer = () => {
@@ -39,9 +35,10 @@ class ConfigServer {
       socket.join(userId as string);
       socket.emit("message", `Wellcom ${socket.id} to nodejs socket.io`);
       createRoom(socket, userId as string);
-      joinRoom(socket, userId as string,  io);
+      joinRoom(socket, userId as string, io);
       listRoom(socket);
-      showDetailRoom(socket);
+      readyGame(socket, io, userId as string, roomId as string);
+      playGame(socket, io, userId as string);
     });
   };
 }
