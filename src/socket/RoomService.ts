@@ -129,6 +129,17 @@ export async function listRoom(socket: Socket) {
   socket.emit("list-room", rooms);
 }
 
+interface iMessagePrivate {
+  message: string;
+  resiverUser: string;
+}
+
+export async function messagePrivate(socket: Socket) {
+  socket.on("message-private", async (request: iMessagePrivate) => {
+    socket.to(request.resiverUser).emit("message-private", request.message);
+  });
+}
+
 export function deleteRoom() {}
 
 export function updateRoom() {}

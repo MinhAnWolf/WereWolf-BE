@@ -10,7 +10,12 @@ const io = new Server(httpServer, {
   },
   // path: "/socket.io?auth",
 });
-import { createRoom, joinRoom, listRoom } from "../socket/RoomService";
+import {
+  createRoom,
+  joinRoom,
+  listRoom,
+  messagePrivate,
+} from "../socket/RoomService";
 import { playGame, readyGame } from "../socket/PlayGameService";
 
 class ConfigServer {
@@ -29,6 +34,7 @@ class ConfigServer {
       console.log("Socket on port : " + port);
       const userId = socket.handshake.headers.userid;
       const roomId = socket.handshake.headers.roomid;
+      console.log(userId);
       if (roomId) {
         socket.join(roomId as string);
       }
@@ -39,6 +45,7 @@ class ConfigServer {
       listRoom(socket);
       readyGame(socket, io, userId as string, roomId as string);
       playGame(socket, io, userId as string);
+      messagePrivate(socket);
     });
   };
 }

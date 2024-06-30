@@ -3,8 +3,8 @@ import HtppFilter from "./core/filter/HtppFilter";
 import socketFilter from "./core/filter/SocketFilter";
 import AuthRoute from "./routes/AuthRoute";
 import RoleRoute from "./routes/RoleRoute";
-const configServer = new ConfigServer();
-configServer.setUpServer();
+new ConfigServer().setUpServer();
+
 require("dotenv").config();
 import cors from "cors";
 
