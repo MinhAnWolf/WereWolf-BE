@@ -6,13 +6,14 @@ import { RoomDetail } from "../type/RoomDetail";
 import { UserSchema } from "../entity/UserSchema";
 
 export async function createRoom(socket: Socket, useridRequest: string) {
-  socket.on("create_room", async (room: Room) => {
+  socket.on("create-room", async (room: Room) => {
     const user = await UserSchema.findOne({
       $or: [{ userid: useridRequest }],
     });
     const data: Room = {
       roomId: uuidv4(),
       userid: [useridRequest],
+      roomName: room.roomName,
       roomOwner: user?.username as string,
       slot: room.slot, // slot quy định
       type: room.type,
@@ -30,7 +31,7 @@ export async function joinRoom(
   useridRequest: string,
   io: Server
 ) {
-  socket.on("join_room", async (roomReq: Room) => {
+  socket.on("join-room", async (roomReq: Room) => {
     await socket.join(roomReq.roomId as string);
     let roomId = roomReq.roomId;
     console.log(roomId);
@@ -75,7 +76,7 @@ export async function joinRoom(
         "message-room",
         userReq?.username + "đã tham gia"
       );
-      io.in(roomId as string).emit("join_room", data);
+      io.in(roomId as string).emit("join-room", data);
     }
   });
 }
@@ -135,9 +136,7 @@ interface iMessagePrivate {
 }
 
 export async function messagePrivate(socket: Socket) {
-  console.log("inside func messagePrivate");
   socket.on("message-private", async (request: iMessagePrivate) => {
-    console.log("socket emit to " + request);
     socket.to(request.resiverUser).emit("message-private", request.message);
   });
 }

@@ -5,6 +5,10 @@ const roomSchema = new Schema({
     type: String,
     require: true,
   },
+  roomName: {
+    type: String,
+    require: true,
+  },
   userid: {
     type: [String],
     require: true,

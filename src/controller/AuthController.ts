@@ -33,6 +33,7 @@ class AuthController {
         errorCode: 0,
         data: {
           username: user?.username,
+          userid: user?.userid,
           access: await genToken(user?.username, "1h"),
           rf: await genToken(user?.username, "1000h"),
         },
