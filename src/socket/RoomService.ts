@@ -135,7 +135,9 @@ interface iMessagePrivate {
 }
 
 export async function messagePrivate(socket: Socket) {
+  console.log("inside func messagePrivate");
   socket.on("message-private", async (request: iMessagePrivate) => {
+    console.log("socket emit to " + request);
     socket.to(request.resiverUser).emit("message-private", request.message);
   });
 }
