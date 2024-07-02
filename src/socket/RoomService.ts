@@ -7,12 +7,13 @@ import { UserSchema } from "../entity/UserSchema";
 
 export async function createRoom(socket: Socket, useridRequest: string) {
   socket.on("create-room", async (room: Room) => {
+    console.log(room);
     const user = await UserSchema.findOne({
       $or: [{ userid: useridRequest }],
     });
     const data: Room = {
       roomId: uuidv4(),
-      userid: [useridRequest],
+      userid: null,
       roomName: room.roomName,
       roomOwner: user?.username as string,
       slot: room.slot, // slot quy định
@@ -20,9 +21,8 @@ export async function createRoom(socket: Socket, useridRequest: string) {
       status: "open", // trạng thái open - watting - in game
       clock: false,
     };
-    socket.join(data.roomId as string);
     await RoomSchema.create(data);
-    listRoom(socket);
+    socket.emit("create-room", data.roomId);
   });
 }
 
@@ -31,53 +31,36 @@ export async function joinRoom(
   useridRequest: string,
   io: Server
 ) {
-  socket.on("join-room", async (roomReq: Room) => {
-    await socket.join(roomReq.roomId as string);
-    let roomId = roomReq.roomId;
-    console.log(roomId);
-    // FIND ONE ROOM
-    const room = await RoomSchema.findOne({ $or: [{ roomId: roomId }] });
-
-    if (room) {
-      // AVOID ADD OWNER ROOM MORE OR USER EXIST ROOM
-      const user = await UserSchema.findOne({
-        $or: [{ userid: useridRequest }],
-      });
-      if (
-        user?.username != room.roomOwner ||
-        !room.userid.includes(useridRequest)
-      ) {
-        room.userid.push(useridRequest);
+  socket.on("join-room", async (roomIdReq: string) => {
+    await socket.join(roomIdReq);
+    const reRoom = await RoomSchema.findOneAndUpdate(
+      { roomIdReq },
+      { $set: { userid: useridRequest } },
+      { new: true }
+    );
+    let data: RoomDetail[] = [];
+    if (reRoom) {
+      for (let i = 0; i < reRoom.userid.length; i++) {
+        const user = await UserSchema.findOne({
+          $or: [{ userid: reRoom.userid[i] }],
+        });
+        // SET DATA ROOM DETAIL
+        data.push({
+          userName: user?.username as string,
+          avartar: user?.avartar as string,
+          roomId: roomIdReq as string,
+          userId: user?.userid as string,
+        });
       }
-      const reRoom = await RoomSchema.findOneAndUpdate(
-        { roomId },
-        { $set: { userid: room.userid } },
-        { new: true }
-      );
-      let data: RoomDetail[] = [];
-      if (reRoom) {
-        for (let i = 0; i < reRoom.userid.length; i++) {
-          const user = await UserSchema.findOne({
-            $or: [{ userid: room.userid[i] }],
-          });
-          // SET DATA ROOM DETAIL
-          data.push({
-            userName: user?.username as string,
-            avartar: user?.avartar as string,
-            roomId: roomId as string,
-            userId: room.userid[i] as string,
-          });
-        }
-      }
-      const userReq = await UserSchema.findOne({
-        $or: [{ userid: useridRequest }],
-      });
-      io.in(roomId as string).emit(
-        "message-room",
-        userReq?.username + "đã tham gia"
-      );
-      io.in(roomId as string).emit("join-room", data);
     }
+    const userReq = await UserSchema.findOne({
+      $or: [{ userid: useridRequest }],
+    });
+    io.in(roomIdReq as string).emit(
+      "message-room",
+      userReq?.username + "đã tham gia"
+    );
+    io.in(roomIdReq as string).emit("join-room", data);
   });
 }
 

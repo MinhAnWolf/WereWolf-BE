@@ -1,7 +1,7 @@
 export interface Room {
   roomId?: String;
   roomName?: String;
-  userid?: [String];
+  userid?: [String] | null;
   roomOwner?: String;
   slot?: Number;
   type?: String;
