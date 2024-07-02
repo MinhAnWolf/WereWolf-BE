@@ -7,7 +7,6 @@ import { UserSchema } from "../entity/UserSchema";
 
 export async function createRoom(socket: Socket, useridRequest: string) {
   socket.on("create-room", async (room: Room) => {
-    console.log(room);
     const user = await UserSchema.findOne({
       $or: [{ userid: useridRequest }],
     });
@@ -31,36 +30,39 @@ export async function joinRoom(
   useridRequest: string,
   io: Server
 ) {
-  socket.on("join-room", async (roomIdReq: string) => {
-    await socket.join(roomIdReq);
+  socket.on("join-room", async (room: Room) => {
+    const roomIdReq = room.roomId as string;
+    console.log("roomid : " + room.roomId);
+    socket.join(roomIdReq);
     const reRoom = await RoomSchema.findOneAndUpdate(
       { roomIdReq },
       { $set: { userid: useridRequest } },
       { new: true }
     );
-    let data: RoomDetail[] = [];
+    let dataRomDetail: RoomDetail[] = [];
     if (reRoom) {
-      for (let i = 0; i < reRoom.userid.length; i++) {
-        const user = await UserSchema.findOne({
-          $or: [{ userid: reRoom.userid[i] }],
-        });
-        // SET DATA ROOM DETAIL
-        data.push({
-          userName: user?.username as string,
-          avartar: user?.avartar as string,
-          roomId: roomIdReq as string,
-          userId: user?.userid as string,
-        });
-      }
+      reRoom.userid.forEach(async (item) => {
+        console.log(item);
+
+        // const user = await UserSchema.findOne({
+        //   $or: [{ userid: item }],
+        // });
+        // // SET DATA ROOM DETAIL
+        // dataRomDetail.push({
+        //   userName: user?.username as string,
+        //   avartar: user?.avartar as string,
+        //   roomId: roomIdReq as string,
+        //   userId: user?.userid as string,
+        // });
+      });
     }
     const userReq = await UserSchema.findOne({
       $or: [{ userid: useridRequest }],
     });
-    io.in(roomIdReq as string).emit(
-      "message-room",
-      userReq?.username + "đã tham gia"
-    );
-    io.in(roomIdReq as string).emit("join-room", data);
+    io.in(roomIdReq as string).emit("message-room", {
+      message: userReq?.username + "đã tham gia",
+      data: dataRomDetail,
+    });
   });
 }
 
