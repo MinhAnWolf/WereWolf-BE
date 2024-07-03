@@ -38,7 +38,9 @@ export async function joinRoom(
   io: Server
 ) {
   socket.on("join-room", async (room: Room) => {
-    const roomIdReq = room.roomId as string;
+    let roomIdReq: any = room.roomId as string;
+    socket.join(roomIdReq);
+    console.log("join room" + roomIdReq);
     if (roomIdReq == null || roomIdReq == "" || roomIdReq == undefined) {
       return;
     }
@@ -46,49 +48,52 @@ export async function joinRoom(
     const oldRoom = await RoomSchema.findOne({
       $or: [{ roomId: roomIdReq }],
     });
-    let reRoom: Room | any;
+    console.log(oldRoom);
     // check oldRoom diff null
-    if (oldRoom !== null) {
-      // owner not push field player
-      if (useridRequest !== oldRoom?.userIdOwner) {
-        oldRoom?.player.push(useridRequest);
-      }
-      // check size oldRoom if add element then fetch new room
-      let sizeBeforePush = oldRoom?.player.length;
-      if (oldRoom?.player.length > sizeBeforePush) {
-        reRoom = await RoomSchema.findOneAndUpdate(
-          { roomIdReq },
-          { $set: { userid: oldRoom?.player } },
-          { new: true }
-        );
-      }
+    // owner not push field player
+    if (useridRequest !== oldRoom?.userIdOwner) {
+      oldRoom?.player.push(useridRequest);
+    }
+    // check size oldRoom if add element then fetch new room
+    const reRoom: Room | null = await RoomSchema.findOneAndUpdate(
+      { roomId: roomIdReq },
+      { $set: { status: "close" } },
+      { new: true }
+    );
+    console.log(reRoom);
 
-      let dataRomDetail: RoomDetail[] = [];
-      // check player have data
-      if (reRoom?.player !== undefined) {
-        reRoom.player.forEach(async (item: any) => {
-          console.log(item);
+    let dataRomDetail: RoomDetail[] = [];
+    // check player have data
+    if (reRoom?.player !== undefined) {
+      reRoom.player.forEach(async (item: any) => {
+        console.log("item : " + item);
 
-          const user = await UserSchema.findOne({
-            $or: [{ userid: item }],
-          });
-          // SET DATA ROOM DETAIL
-          dataRomDetail.push({
-            userName: user?.username as string,
-            avartar: user?.avartar as string,
-            roomId: roomIdReq as string,
-            userId: user?.userid as string,
-          });
+        const user = await UserSchema.findOne({
+          $or: [{ userid: item }],
         });
-      }
-      const userReq = await UserSchema.findOne({
-        $or: [{ userid: useridRequest }],
-      });
-      io.in(roomIdReq as string).emit("message-room", {
-        message: userReq?.username + "đã tham gia",
-        data: dataRomDetail,
+        console.log(user);
+        // SET DATA ROOM DETAIL
+        dataRomDetail.push({
+          userName: user?.username as string,
+          avartar: user?.avartar as string,
+          roomId: roomIdReq as string,
+          userId: user?.userid as string,
+        });
+
+        console.log(dataRomDetail);
       });
     }
+    const userReq = await UserSchema.findOne({
+      $or: [{ userid: useridRequest }],
+    });
+    console.log(dataRomDetail);
+
+    socket.emit("test", "hello");
+
+    io.in(roomIdReq as string).emit("message-room", {
+      message: userReq?.username + "đã tham gia",
+      data: dataRomDetail,
+    });
   });
 }
 
