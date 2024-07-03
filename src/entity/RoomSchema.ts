@@ -9,11 +9,15 @@ const roomSchema = new Schema({
     type: String,
     require: true,
   },
-  userid: {
+  player: {
     type: [String],
     require: true,
   },
   roomOwner: {
+    type: String,
+    require: true,
+  },
+  userIdOwner: {
     type: String,
     require: true,
   },

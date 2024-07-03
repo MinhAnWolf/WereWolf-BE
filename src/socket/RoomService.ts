@@ -5,23 +5,30 @@ import { RoomSchema } from "../entity/RoomSchema";
 import { RoomDetail } from "../type/RoomDetail";
 import { UserSchema } from "../entity/UserSchema";
 
-export async function createRoom(socket: Socket, useridRequest: string) {
+export async function createRoom(
+  socket: Socket,
+  useridRequest: string,
+  io: Server
+) {
   socket.on("create-room", async (room: Room) => {
     const user = await UserSchema.findOne({
       $or: [{ userid: useridRequest }],
     });
     const data: Room = {
       roomId: uuidv4(),
-      userid: null,
+      player: [useridRequest],
       roomName: room.roomName,
       roomOwner: user?.username as string,
+      userIdOwner: useridRequest as string,
       slot: room.slot, // slot quy định
       type: room.type,
       status: "open", // trạng thái open - watting - in game
       clock: false,
     };
     await RoomSchema.create(data);
+    socket.join(data.roomId as string);
     socket.emit("create-room", data.roomId);
+    listRoom(io);
   });
 }
 
@@ -32,37 +39,56 @@ export async function joinRoom(
 ) {
   socket.on("join-room", async (room: Room) => {
     const roomIdReq = room.roomId as string;
-    console.log("roomid : " + room.roomId);
-    socket.join(roomIdReq);
-    const reRoom = await RoomSchema.findOneAndUpdate(
-      { roomIdReq },
-      { $set: { userid: useridRequest } },
-      { new: true }
-    );
-    let dataRomDetail: RoomDetail[] = [];
-    if (reRoom) {
-      reRoom.userid.forEach(async (item) => {
-        console.log(item);
+    if (roomIdReq == null || roomIdReq == "" || roomIdReq == undefined) {
+      return;
+    }
+    // Handle push user when join
+    const oldRoom = await RoomSchema.findOne({
+      $or: [{ roomId: roomIdReq }],
+    });
+    let reRoom: Room | any;
+    // check oldRoom diff null
+    if (oldRoom !== null) {
+      // owner not push field player
+      if (useridRequest !== oldRoom?.userIdOwner) {
+        oldRoom?.player.push(useridRequest);
+      }
+      // check size oldRoom if add element then fetch new room
+      let sizeBeforePush = oldRoom?.player.length;
+      if (oldRoom?.player.length > sizeBeforePush) {
+        reRoom = await RoomSchema.findOneAndUpdate(
+          { roomIdReq },
+          { $set: { userid: oldRoom?.player } },
+          { new: true }
+        );
+      }
 
-        // const user = await UserSchema.findOne({
-        //   $or: [{ userid: item }],
-        // });
-        // // SET DATA ROOM DETAIL
-        // dataRomDetail.push({
-        //   userName: user?.username as string,
-        //   avartar: user?.avartar as string,
-        //   roomId: roomIdReq as string,
-        //   userId: user?.userid as string,
-        // });
+      let dataRomDetail: RoomDetail[] = [];
+      // check player have data
+      if (reRoom?.player !== undefined) {
+        reRoom.player.forEach(async (item: any) => {
+          console.log(item);
+
+          const user = await UserSchema.findOne({
+            $or: [{ userid: item }],
+          });
+          // SET DATA ROOM DETAIL
+          dataRomDetail.push({
+            userName: user?.username as string,
+            avartar: user?.avartar as string,
+            roomId: roomIdReq as string,
+            userId: user?.userid as string,
+          });
+        });
+      }
+      const userReq = await UserSchema.findOne({
+        $or: [{ userid: useridRequest }],
+      });
+      io.in(roomIdReq as string).emit("message-room", {
+        message: userReq?.username + "đã tham gia",
+        data: dataRomDetail,
       });
     }
-    const userReq = await UserSchema.findOne({
-      $or: [{ userid: useridRequest }],
-    });
-    io.in(roomIdReq as string).emit("message-room", {
-      message: userReq?.username + "đã tham gia",
-      data: dataRomDetail,
-    });
   });
 }
 
@@ -76,7 +102,7 @@ export async function leaveRoom(
     socket.leave(roomId);
     const room = await RoomSchema.findOne({ $or: [{ roomId: roomId }] });
     if (room) {
-      let useridOld = room.userid;
+      let useridOld = room.player;
       let newUserid = useridOld.filter((item) => item != useridRequest);
       const reRoom = await RoomSchema.findOneAndUpdate(
         { roomId },
@@ -85,16 +111,16 @@ export async function leaveRoom(
       );
       let data: RoomDetail[] = [];
       if (reRoom) {
-        for (let i = 0; i < reRoom.userid.length; i++) {
+        for (let i = 0; i < reRoom.player.length; i++) {
           const user = await UserSchema.findOne({
-            $or: [{ userid: room.userid[i] }],
+            $or: [{ userid: room.player[i] }],
           });
           // SET DATA ROOM DETAIL
           data.push({
             userName: user?.username as string,
             avartar: user?.avartar as string,
             roomId: roomId as string,
-            userId: room.userid[i] as string,
+            userId: room.player[i] as string,
           });
         }
       }
@@ -110,9 +136,10 @@ export async function leaveRoom(
   });
 }
 
-export async function listRoom(socket: Socket) {
+export async function listRoom(io: Server) {
+  console.log("list room");
   const rooms = await RoomSchema.find().lean();
-  socket.emit("list-room", rooms);
+  io.emit("list-room", rooms);
 }
 
 interface iMessagePrivate {

@@ -38,11 +38,12 @@ class ConfigServer {
       if (roomId) {
         socket.join(roomId as string);
       }
+      io.emit("test", "message system");
       socket.join(userId as string);
       socket.emit("message", `Wellcom ${socket.id} to nodejs socket.io`);
-      createRoom(socket, userId as string);
+      createRoom(socket, userId as string, io);
       joinRoom(socket, userId as string, io);
-      listRoom(socket);
+      listRoom(io);
       readyGame(socket, io, userId as string, roomId as string);
       playGame(socket, io, userId as string);
       messagePrivate(socket);

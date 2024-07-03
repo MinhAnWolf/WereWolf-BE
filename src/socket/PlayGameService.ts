@@ -31,7 +31,7 @@ export function playGame(socket: Socket, io: Server, useridReq: string) {
           return;
         }
         let memoryRole: number[] = [];
-        roomDetail.userid?.forEach((item) => {
+        roomDetail.player?.forEach((item) => {
           // CREATE PLAYER ID
           socket.join(item + "player");
           // HANDLE ROLE
