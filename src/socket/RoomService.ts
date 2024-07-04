@@ -39,8 +39,7 @@ export async function joinRoom(
 ) {
   socket.on("join-room", async (room: Room) => {
     let roomIdReq: any = room.roomId as string;
-    socket.join(roomIdReq);
-    console.log("join room" + roomIdReq);
+    console.log("join room " + roomIdReq);
     if (roomIdReq == null || roomIdReq == "" || roomIdReq == undefined) {
       return;
     }
@@ -49,29 +48,36 @@ export async function joinRoom(
       $or: [{ roomId: roomIdReq }],
     });
     console.log(oldRoom);
+    // check if owner room then terminate process
+    if (useridRequest === oldRoom?.userIdOwner) {
+      return;
+    }
     // check oldRoom diff null
     // owner not push field player
-    if (useridRequest !== oldRoom?.userIdOwner) {
+    if (
+      useridRequest !== oldRoom?.userIdOwner ||
+      oldRoom.player.includes(useridRequest)
+    ) {
+      console.log("update user");
+
+      socket.join(roomIdReq);
       oldRoom?.player.push(useridRequest);
     }
+    socket.to(roomIdReq).emit("test", "hello");
     // check size oldRoom if add element then fetch new room
     const reRoom: Room | null = await RoomSchema.findOneAndUpdate(
       { roomId: roomIdReq },
-      { $set: { status: "close" } },
+      { $set: { player: oldRoom?.player } },
       { new: true }
     );
-    console.log(reRoom);
-
     let dataRomDetail: RoomDetail[] = [];
     // check player have data
     if (reRoom?.player !== undefined) {
-      reRoom.player.forEach(async (item: any) => {
+      await reRoom.player.forEach(async (item: any) => {
         console.log("item : " + item);
-
         const user = await UserSchema.findOne({
           $or: [{ userid: item }],
         });
-        console.log(user);
         // SET DATA ROOM DETAIL
         dataRomDetail.push({
           userName: user?.username as string,
@@ -79,17 +85,13 @@ export async function joinRoom(
           roomId: roomIdReq as string,
           userId: user?.userid as string,
         });
-
-        console.log(dataRomDetail);
       });
     }
     const userReq = await UserSchema.findOne({
       $or: [{ userid: useridRequest }],
     });
-    console.log(dataRomDetail);
-
-    socket.emit("test", "hello");
-
+    console.log("dataRomDetail " + dataRomDetail);
+    console.log(userReq?.username + "đã tham gia");
     io.in(roomIdReq as string).emit("message-room", {
       message: userReq?.username + "đã tham gia",
       data: dataRomDetail,
